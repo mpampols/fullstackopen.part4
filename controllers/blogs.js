@@ -10,7 +10,7 @@ blogsRouter.get('/', (request, response) => {
 blogsRouter.post('/', async (request, response) => {
   const blog = new Blog(request.body)
 
-  // Retrn 400 Bad request if title and URL are missing
+  // Return 400 Bad request if title and URL are missing
   if (!blog.title && !blog.url) {
     response.status(400)
   }

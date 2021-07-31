@@ -38,3 +38,24 @@ describe('when there is initially one user in db', () => {
     expect(usernames).toContain(newUser.username)
   })
 })
+
+describe('when we try to create invalid users', () => {
+  test('creation fails with validation error', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      username: 'mpampols',
+      name: 'Marc',
+      password: 'mp',
+    }
+
+    await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await helper.usersInDb()
+    expect(usersAtEnd).toHaveLength(usersAtStart.length)
+  })
+})
