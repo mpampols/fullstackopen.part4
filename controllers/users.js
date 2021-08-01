@@ -1,10 +1,11 @@
-const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 const usersRouter = require('express').Router()
 const User = require('../models/user')
 
 usersRouter.get('/', async (request, response) => {
-  const users = await User.find({})
+  const users = await User
+    .find({})
+    .populate('blogs')
   response.json(users)
 })
 
@@ -29,10 +30,6 @@ usersRouter.post('/', async (request, response) => {
 
   const savedUser = await user.save()
   response.json(savedUser)
-})
-
-afterAll(() => {
-  mongoose.connection.close()
 })
 
 module.exports = usersRouter

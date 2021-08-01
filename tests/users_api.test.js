@@ -1,4 +1,5 @@
 const supertest = require('supertest')
+const mongoose = require('mongoose')
 const app = require('../app')
 const api = supertest(app)
 
@@ -58,4 +59,8 @@ describe('when we try to create invalid users', () => {
     const usersAtEnd = await helper.usersInDb()
     expect(usersAtEnd).toHaveLength(usersAtStart.length)
   })
+})
+
+afterAll(() => {
+  mongoose.connection.close()
 })
