@@ -120,7 +120,7 @@ test('return 400 Bad Request if title and URL are missing', async () => {
 /**
  * 4.23*: Return unauthorized if token is not provided
  */
- test('return 401 Unauthorized if token is not provided', async () => {
+test('return 401 Unauthorized if token is not provided', async () => {
   const blogToBeAdded = {
     'title': 'Marc\'s blog test',
     'author': 'Marc Pampols',
