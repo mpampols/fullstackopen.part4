@@ -21,7 +21,13 @@ beforeEach(async () => {
  * 4.8: Blog list tests, step1
  */
 test('all blog posts are returned', async () => {
-  const response = await api.get('/api/blogs')
+  const response = await api
+    .get('/api/blogs')
+    .set({
+      'Content-Type': 'application/json',
+      'Authorization': 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1wYW1wb2xzIiwiaWQiOiI2MTA2ODJhMDJjYmY3MTNiZmU5ZmM2ZmYiLCJpYXQiOjE2Mjc4MzA5Mzd9.rWjYsjdf7ERiTnNAIKsNBqMm2d-hGLXAUFt5wAjkQRk'
+    })
+
   expect(response.body).toHaveLength(helper.initialBlogs.length)
 })
 
@@ -29,7 +35,13 @@ test('all blog posts are returned', async () => {
  * 4.9*: Blog list tests, step2
  */
 test('the unique identifier property of the blog posts is named id', async () => {
-  const response = await api.get('/api/blogs')
+  const response = await api
+    .get('/api/blogs')
+    .set({
+      'Content-Type': 'application/json',
+      'Authorization': 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1wYW1wb2xzIiwiaWQiOiI2MTA2ODJhMDJjYmY3MTNiZmU5ZmM2ZmYiLCJpYXQiOjE2Mjc4MzA5Mzd9.rWjYsjdf7ERiTnNAIKsNBqMm2d-hGLXAUFt5wAjkQRk'
+    })
+
   for (let blogPost of response.body) {
     expect(blogPost.id).toBeDefined()
   }
@@ -40,8 +52,8 @@ test('the unique identifier property of the blog posts is named id', async () =>
  */
 test('verify that HTTP POST creates a blog post', async () => {
   const newBlogPost = {
-    'title': 'Marc\'s blog 4',
-    'author': 'Marc Pampols 4',
+    'title': 'Marc\'s blog 9',
+    'author': 'Marc Pampols 9',
     'url': 'https://marcpampols4.net',
     'likes': 25,
   }
@@ -49,6 +61,10 @@ test('verify that HTTP POST creates a blog post', async () => {
   await api
     .post('/api/blogs')
     .send(newBlogPost)
+    .set({
+      'Content-Type': 'application/json',
+      'Authorization': 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1wYW1wb2xzIiwiaWQiOiI2MTA2ODJhMDJjYmY3MTNiZmU5ZmM2ZmYiLCJpYXQiOjE2Mjc4MzA5Mzd9.rWjYsjdf7ERiTnNAIKsNBqMm2d-hGLXAUFt5wAjkQRk'
+    })
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
@@ -68,6 +84,10 @@ test('if likes property is missing, default to 0', async () => {
 
   const addedBlog = await api
     .post('/api/blogs')
+    .set({
+      'Content-Type': 'application/json',
+      'Authorization': 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1wYW1wb2xzIiwiaWQiOiI2MTA2ODJhMDJjYmY3MTNiZmU5ZmM2ZmYiLCJpYXQiOjE2Mjc4MzA5Mzd9.rWjYsjdf7ERiTnNAIKsNBqMm2d-hGLXAUFt5wAjkQRk'
+    })
     .send(blogToBeAdded)
     .expect(200)
     .expect('Content-Type', /application\/json/)
@@ -86,11 +106,34 @@ test('return 400 Bad Request if title and URL are missing', async () => {
 
   await api
     .post('/api/blogs')
+    .set({
+      'Content-Type': 'application/json',
+      'Authorization': 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1wYW1wb2xzIiwiaWQiOiI2MTA2ODJhMDJjYmY3MTNiZmU5ZmM2ZmYiLCJpYXQiOjE2Mjc4MzA5Mzd9.rWjYsjdf7ERiTnNAIKsNBqMm2d-hGLXAUFt5wAjkQRk'
+    })
     .send(blogToBeAdded)
     .expect(400)
 
   const blogsAtEnd = await helper.blogsInDb()
   expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
+})
+
+/**
+ * 4.23*: Return unauthorized if token is not provided
+ */
+ test('return 401 Unauthorized if token is not provided', async () => {
+  const blogToBeAdded = {
+    'title': 'Marc\'s blog test',
+    'author': 'Marc Pampols',
+    'url': 'https://marcpampols.net',
+  }
+
+  await api
+    .post('/api/blogs')
+    .set({
+      'Content-Type': 'application/json',
+    })
+    .send(blogToBeAdded)
+    .expect(401)
 })
 
 /**

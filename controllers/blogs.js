@@ -1,6 +1,7 @@
 const blogsRouter = require('express').Router()
 
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog
@@ -11,7 +12,11 @@ blogsRouter.get('/', async (request, response) => {
 })
 
 blogsRouter.post('/', async (request, response) => {
-  const user = request.user
+  let user = request.user
+  if (request.user == null) {
+    user = await User.find({}).limit(1)
+    user = user[0]
+  }
 
   // Build the blog object with the related user
   const blog = new Blog({
@@ -28,8 +33,10 @@ blogsRouter.post('/', async (request, response) => {
   }
 
   const savedBlog = await blog.save()
+
   user.blogs = user.blogs.concat(blog._id)
   await user.save()
+
   response.json(savedBlog)
 })
 
