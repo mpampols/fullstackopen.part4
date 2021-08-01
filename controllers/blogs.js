@@ -1,9 +1,6 @@
-const jwt = require('jsonwebtoken')
-
 const blogsRouter = require('express').Router()
 
 const Blog = require('../models/blog')
-const User = require('../models/user')
 
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog
@@ -14,14 +11,7 @@ blogsRouter.get('/', async (request, response) => {
 })
 
 blogsRouter.post('/', async (request, response) => {
-  // Get the authenticated user
-  const decodedToken = jwt.verify(request.token, process.env.SECRET)
-  if (!request.token || !decodedToken.id) {
-    return response.status(401).json({
-      error: 'Token missing or invalid'
-    })
-  }
-  const user = await User.findById(decodedToken.id)
+  const user = request.user
 
   // Build the blog object with the related user
   const blog = new Blog({
@@ -61,7 +51,28 @@ blogsRouter.put('/:id', async (request, response) => {
 })
 
 blogsRouter.delete('/:id', async (request, response) => {
+  const user = request.user
+
+  // Get the blog to get its author
+  const blog = await Blog.findById(request.params.id)
+
+  // Check of blog exists
+  if (!blog) {
+    return response.status(400).json({
+      error: 'The blog you are trying to delete does not exists'
+    })
+  }
+
+  // Blog can only be deleted by its author
+  if (!request.token || (user.id.toString() !== blog.user.toString())) {
+    return response.status(400).json({
+      error: 'You can not delete the blog because you are not the author'
+    })
+  }
+
+  // Delete the blog
   await Blog.findByIdAndRemove(request.params.id)
+
   response.status(204).end()
 })
 
