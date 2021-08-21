@@ -8,7 +8,6 @@ blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog
     .find({})
     .populate('user', {username: 1, name: 1, id: 1})
-
   response.json(blogs)
 })
 
@@ -33,12 +32,14 @@ blogsRouter.post('/', middleware.userExtractor, async (request, response) => {
     response.status(400)
   }
 
-  const savedBlog = await blog.save()
-
+  await blog.save()
   user.blogs = user.blogs.concat(blog._id)
   await user.save()
 
-  response.json(savedBlog)
+  const createdBlog = await Blog
+    .findById(blog._id)
+    .populate('user', {username: 1, name: 1, id: 1})
+  response.json(createdBlog)
 })
 
 blogsRouter.put('/:id', middleware.userExtractor, async (request, response) => {
